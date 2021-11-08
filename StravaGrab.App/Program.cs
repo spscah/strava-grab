@@ -21,9 +21,9 @@ namespace StravaGrab.App
     {
         static void Main(string[] args)
         {
-//            CyclingWeekly();
-             Gvrat21();
+            //            CyclingWeekly();
 
+            MonthlyTotal(3650);
 //            CalculatePremiershipTour();
 
             Parser
@@ -381,6 +381,18 @@ namespace StravaGrab.App
         static double AnnualTotal(bool onlyRunning = true, bool rolling = false) {
             DateTime startDate = rolling ? DateTime.Today.AddYears(-1) : new DateTime(DateTime.Today.Year,1,1);
             return ListOfActivities(startDate, null, onlyRunning).Select(a => a.Distance).Sum();
+        }
+
+        static double MonthlyTotal(int target) {
+            IList<Activity> thisYear = ListOfActivities(new DateTime(DateTime.Today.Year, 1, 1), null, true);
+            for(int i = 0; i < 12; ++i) {
+                Console.WriteLine($"{new DateTime(DateTime.Today.Year, i + 1, 1).ToString("MMM")}: {thisYear.Where(a => a.Date.Month == i + 1).Select(a => a.Distance).Sum():F0}");
+
+            }
+            int daysRemaining = (new DateTime(DateTime.Today.Year + 1, 1, 1) - DateTime.Today).Days;
+            double kmRemaining = (double)target - thisYear.Select(a => a.Distance).Sum();
+            Console.WriteLine($"{daysRemaining} remaining to run {kmRemaining:F2} => {kmRemaining/daysRemaining:F2} km/d -1");
+            return kmRemaining;
         }
 
         // 400 miles in February/March 2021: https://centurionrunning.com/reports/2021/one-slam-2021-race-report
